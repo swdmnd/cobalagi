@@ -39,7 +39,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define USART3_BUFFER_SIZE 320
+#define USART_BUFFER_SIZE 320
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -51,20 +51,26 @@ uint8_t Send_Buffer[64];
 uint32_t packet_sent=1;
 uint32_t packet_receive=1;
 
-uint8_t USART3_buffer[USART3_BUFFER_SIZE];
-uint16_t USART3_tail=0;
-uint16_t USART3_head=0;
-bool USART3_overflow=false;
-bool USART3_empty = false;
-int led_state = 0;
+typedef struct{
+  uint8_t buffer[USART_BUFFER_SIZE];
+  uint16_t tail;
+  uint16_t head;
+  bool isoverflow;
+  bool isempty;
+} USART_BUFFER;
+
+int led_state=0;
+
+USART_BUFFER U1_buf;
 
 unsigned char welcome_msg[] = "Selamat datang di TA Muhammad Arief Fatkhurrahman!\r\n";
 /* Private function prototypes -----------------------------------------------*/
 void delay_ms(uint32_t);
-uint8_t get_char(void);
-void enqueue(int8_t);
-uint8_t dequeue();
-void clear_queue();
+uint8_t get_char(USART_BUFFER*);
+void init_usart_buffer(USART_BUFFER*);
+void enqueue(USART_BUFFER*, int8_t);
+uint8_t dequeue(USART_BUFFER*);
+void clear_queue(USART_BUFFER*);
 
 /* Private functions ---------------------------------------------------------*/
 /*******************************************************************************
@@ -85,7 +91,7 @@ int main(void)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
   GPIO_InitTypeDef gpio;
   GPIO_StructInit(&gpio);
@@ -98,6 +104,8 @@ int main(void)
   gpio.GPIO_Speed = GPIO_Speed_2MHz;
   gpio.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOB , &gpio);
+
+  GPIO_PinRemapConfig(GPIO_Remap_USART1, ENABLE);
 
   // Initialize USART1_Tx
   gpio.GPIO_Pin = GPIO_Pin_10;
@@ -121,17 +129,19 @@ int main(void)
   USART_InitStructure.USART_StopBits = USART_StopBits_1;
   USART_InitStructure.USART_Parity = USART_Parity_No ;
   USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_Init(USART3 ,&USART_InitStructure);
-  USART_Cmd(USART3 , ENABLE);
+  USART_Init(USART1,&USART_InitStructure);
+  USART_Cmd(USART1, ENABLE);
 
   NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
-  USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+
+  init_usart_buffer(&U1_buf);
 
 
   SysTick_Config(SystemCoreClock / 1000);
@@ -159,11 +169,11 @@ int main(void)
         Receive_length = 0;
       }
       if(!first_time){
-        d = get_char();
+        d = get_char(&U1_buf);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, d%2 ? Bit_SET : Bit_RESET);
-        if(!USART3_empty)
+        if(!U1_buf.isempty)
         {
-          sprintf(data, "%2x", d);
+          sprintf(data, "%c", d);
           CDC_Send_DATA (data,strlen(data));
         }
       }
@@ -190,58 +200,65 @@ void SysTick_Handler(void){
   TimingDelay --;
 }
 
-uint8_t get_char(void){
-  return dequeue();
+uint8_t get_char(USART_BUFFER* u_buf){
+  return dequeue(u_buf);
 }
 
-void enqueue(int8_t data)
+void init_usart_buffer(USART_BUFFER* u_buf){
+  u_buf->tail=0;
+  u_buf->head=0;
+  u_buf->isoverflow=false;
+  u_buf->isempty=false;
+}
+
+void enqueue(USART_BUFFER* u_buf, int8_t data)
 {
-  USART3_buffer[USART3_tail] = data;
-  if(++USART3_tail >= USART3_BUFFER_SIZE)
+  u_buf->buffer[u_buf->tail] = data;
+  if(++u_buf->tail >= USART_BUFFER_SIZE)
   {
-    USART3_tail = 0;
+    u_buf->tail = 0;
   }
-  if(USART3_tail == USART3_head)
+  if(u_buf->tail == u_buf->head)
   {
-    if(++USART3_head >= USART3_BUFFER_SIZE)
+    if(++u_buf->head >= USART_BUFFER_SIZE)
     {
-      USART3_head = 0;
+      u_buf->head = 0;
     }
-    USART3_overflow=true;
+    u_buf->isoverflow=true;
   }
 }
 
-uint8_t dequeue()
+uint8_t dequeue(USART_BUFFER* u_buf)
 {
-  USART3_empty = false;
-  if(USART3_tail == USART3_head)
+  u_buf->isempty = false;
+  if(u_buf->tail == u_buf->head)
   {
-    USART3_empty = true;
+    u_buf->isempty = true;
     return 0;
   }
-  if(--USART3_tail < 0)
+  if(--u_buf->tail < 0)
   {
-    USART3_tail = USART3_BUFFER_SIZE-1;
+    u_buf->tail = USART_BUFFER_SIZE-1;
   }
-  return USART3_buffer[USART3_tail];
+  return u_buf->buffer[u_buf->tail];
 }
 
-void clear_queue()
+void clear_queue(USART_BUFFER* u_buf)
 {
-  USART3_tail = USART3_head = USART3_overflow = 0;
+  u_buf->tail = u_buf->head = u_buf->isoverflow = 0;
 }
 
-void USART3_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
   GPIO_WriteBit(GPIOC, GPIO_Pin_13, led_state ? Bit_SET : Bit_RESET);
   led_state = !led_state;
-  if(USART_GetITStatus(USART3 , USART_IT_RXNE) != RESET)
+  if(USART_GetITStatus(USART1 , USART_IT_RXNE) != RESET)
   {
     uint8_t data;
     // buffer the data (or toss it if there's no room
     // Flow control will prevent this
-    data = USART_ReceiveData(USART3) & 0xff;
-    enqueue(data);
+    data = USART_ReceiveData(USART1) & 0xff;
+    enqueue(&U1_buf, data);
   }
 }
 
