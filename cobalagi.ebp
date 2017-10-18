@@ -87,7 +87,9 @@
 		<Unit filename="cmsis\core_cmFunc.h" />
 		<Unit filename="cmsis\core_cmInstr.h" />
 		<Unit filename="inc\hw_config.h" />
+		<Unit filename="inc\main.h" />
 		<Unit filename="inc\platform_config.h" />
+		<Unit filename="inc\sim900a.h" />
 		<Unit filename="inc\stm3210b_eval.h" />
 		<Unit filename="inc\stm3210b_eval_i2c_tsensor.h" />
 		<Unit filename="inc\stm3210b_eval_spi_flash.h" />
@@ -97,6 +99,7 @@
 		<Unit filename="inc\stm32f10x.h" />
 		<Unit filename="inc\stm32f10x_conf.h" />
 		<Unit filename="inc\system_stm32f10x.h" />
+		<Unit filename="inc\usart_conf.h" />
 		<Unit filename="inc\usb_conf.h" />
 		<Unit filename="inc\usb_core.h" />
 		<Unit filename="inc\usb_def.h" />
@@ -210,6 +213,9 @@
 		<Unit filename="src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\sim900a.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src\startup_stm32f10x_md.S">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -229,6 +235,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\system_stm32f10x.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\usart_conf.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\usb_core.c">
