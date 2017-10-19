@@ -3,7 +3,7 @@
 
 #define USART_BUFFER_SIZE 320
 
-#define _DEBUG_SIM900A_
+#define _DEBUG_SIM900A_ 1
 
 #ifdef _DEBUG_SIM900A_
   #include "hw_config.h"
@@ -15,6 +15,7 @@
 #endif
 
 #include "platform_config.h"
+#include "timers_conf.h"
 #include <stdbool.h>
 
 typedef struct{
@@ -25,16 +26,17 @@ typedef struct{
   bool isoverflow;
 } USART_BUFFER;
 
-extern USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
+extern __IO USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
 
 void USART_Config();
-uint8_t get_char(USART_BUFFER*);
-void put_char(USART_BUFFER*, uint8_t);
-void init_usart_buffer(USART_BUFFER*, USART_TypeDef*);
-void enqueue(USART_BUFFER*, uint8_t);
-uint8_t dequeue(USART_BUFFER*);
-void clear_queue(USART_BUFFER*);
-bool isempty(USART_BUFFER*);
-void print_r(USART_BUFFER*, uint8_t*, int);
+uint8_t get_char(__IO USART_BUFFER*);
+void put_char(__IO USART_BUFFER*, uint8_t);
+void init_usart_buffer(__IO USART_BUFFER*, USART_TypeDef*);
+void enqueue(__IO USART_BUFFER*, uint8_t);
+uint8_t dequeue(__IO USART_BUFFER*);
+void clear_queue(__IO USART_BUFFER*);
+bool isempty(__IO USART_BUFFER*);
+void print_r(__IO USART_BUFFER*, uint8_t*, int);
+bool USART_wait_for(__IO USART_BUFFER*, uint8_t*, uint32_t);
 
 #endif /* USART_CONF_H_INCLUDED */

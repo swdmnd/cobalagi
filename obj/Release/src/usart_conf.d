@@ -13,4 +13,5 @@ obj\release\src\usart_conf.o: src\usart_conf.c inc/usart_conf.h \
  SPL\inc/stm32f10x_wwdg.h SPL\inc/misc.h inc/stm3210b_eval.h \
  inc/stm32_eval_legacy.h inc/usb_type.h inc/usb_conf.h inc/usb_lib.h \
  inc/usb_regs.h inc/usb_def.h inc/usb_core.h inc/usb_init.h inc/usb_sil.h \
- inc/usb_mem.h inc/usb_int.h inc/usb_desc.h inc/usb_pwr.h
+ inc/usb_mem.h inc/usb_int.h inc/usb_desc.h inc/usb_pwr.h \
+ inc/timers_conf.h

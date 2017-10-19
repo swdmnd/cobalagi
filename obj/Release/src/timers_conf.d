@@ -1,4 +1,4 @@
-obj\release\src\main.o: src\main.c inc/main.h inc/hw_config.h \
+obj\release\src\timers_conf.o: src\timers_conf.c inc/timers_conf.h \
  inc/platform_config.h inc/stm32f10x.h cmsis/core_cm3.h \
  cmsis/core_cmInstr.h cmsis/core_cmFunc.h inc/system_stm32f10x.h \
  inc/stm32f10x_conf.h SPL\inc/stm32f10x_adc.h inc/stm32f10x.h \
@@ -11,7 +11,4 @@ obj\release\src\main.o: src\main.c inc/main.h inc/hw_config.h \
  SPL\inc/stm32f10x_rtc.h SPL\inc/stm32f10x_sdio.h SPL\inc/stm32f10x_spi.h \
  SPL\inc/stm32f10x_tim.h SPL\inc/stm32f10x_usart.h \
  SPL\inc/stm32f10x_wwdg.h SPL\inc/misc.h inc/stm3210b_eval.h \
- inc/stm32_eval_legacy.h inc/usb_type.h inc/usb_conf.h inc/usb_lib.h \
- inc/usb_regs.h inc/usb_def.h inc/usb_core.h inc/usb_init.h inc/usb_sil.h \
- inc/usb_mem.h inc/usb_int.h inc/usb_desc.h inc/usb_pwr.h \
- inc/timers_conf.h inc/usart_conf.h inc/sim900a.h
+ inc/stm32_eval_legacy.h

@@ -7,6 +7,7 @@
 #include "usb_desc.h"
 #include "usb_pwr.h"
 
+#include "timers_conf.h"
 #include "usart_conf.h"
 #include "sim900a.h"
 

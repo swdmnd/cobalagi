@@ -718,17 +718,20 @@
 1358792850 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usb_sil.c
 	"usb_lib.h"
 
-1508337114 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
+1508378398 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
 	"main.h"
 
-1508299710 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\sim900a.c
+1508378316 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\sim900a.c
 	"sim900a.h"
 
-1508299391 d:\my files\aa\teknik elektro\ta\cobalagi\inc\sim900a.h
+1508377491 d:\my files\aa\teknik elektro\ta\cobalagi\inc\sim900a.h
 	"usart_conf.h"
+	"timers_conf.h"
 	<string.h>
+	<stdbool.h>
+	<stdlib.h>
 
-1508306789 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
+1508377491 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
 	"hw_config.h"
 	"usb_lib.h"
 	"usb_desc.h"
@@ -736,19 +739,28 @@
 	<stdio.h>
 	<string.h>
 	"platform_config.h"
+	"timers_conf.h"
 	<stdbool.h>
 
-1508316948 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usart_conf.c
+1508377491 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usart_conf.c
 	"usart_conf.h"
 
-1508208359 d:\my files\aa\teknik elektro\ta\cobalagi\inc\main.h
+1508361286 d:\my files\aa\teknik elektro\ta\cobalagi\inc\main.h
 	"hw_config.h"
 	"usb_lib.h"
 	"usb_desc.h"
 	"usb_pwr.h"
+	"timers_conf.h"
 	"usart_conf.h"
 	"sim900a.h"
 	<stdio.h>
 	<string.h>
 	<stdbool.h>
+	<time.h>
+
+1508369158 d:\my files\aa\teknik elektro\ta\cobalagi\inc\timers_conf.h
+	"platform_config.h"
+
+1508369183 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\timers_conf.c
+	"timers_conf.h"
 

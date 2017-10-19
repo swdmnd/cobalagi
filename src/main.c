@@ -48,7 +48,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-long millis = 0;
+
 
 /* Extern variables ----------------------------------------------------------*/
 extern __IO uint8_t Receive_Buffer[64];
@@ -68,8 +68,7 @@ GTC_BUFFER_STRUCT GTC_Buffer;
 
 unsigned char welcome_msg[] = "---Debug log start---\r\n";
 /* Private function prototypes -----------------------------------------------*/
-void delay_ms(uint32_t);
-void Timers_Init();
+
 
 int main(void)
 {
@@ -77,6 +76,9 @@ int main(void)
   Set_USBClock();
   USB_Interrupts_Config();
   USB_Init();
+
+  SysTick_Config(SystemCoreClock / 1000);
+  RTC_Software_Init();
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
@@ -88,9 +90,13 @@ int main(void)
   GPIO_Init(GPIOC, &gpio);
 
   USART_Config();
-  sim900_config_buffer(&U2_buf_tx);
+  sim900_config_buffer(&U2_buf_tx, &U2_buf_rx);
+  sim900_init();
 
-  SysTick_Config(SystemCoreClock / 1000);
+  //sync time
+  RTC_WaitForLastTask();
+  RTC_SetCounter(get_server_time());
+  RTC_WaitForLastTask();
 
   Timers_Init();
 
@@ -157,7 +163,7 @@ int main(void)
               //sprintf(data, "%c", Receive_Buffer[0]);
               //CDC_Send_DATA (data,strlen(data));
             } else if(Receive_Buffer[0] == '9'){
-              sprintf(AT_CMD_BUF, _http_post, strlen(_post_params), _post_params);
+              sprintf(AT_CMD_BUF, _http_post, strlen(_post_params_3), _post_params);
               send_sim_cmd(AT_CMD_BUF);
               put_char(&U2_buf_tx, (uint8_t) 26);
 //              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
@@ -204,47 +210,15 @@ int main(void)
           if(cur_i>3){
             sprintf(data, "[%ld] RFID Detected: %02x%02x%02x%02x\r\n", millis, id[0], id[1], id[2], id[3]);
             CDC_Send_DATA (data,strlen(data));
-            sprintf(data, "[%ld] Connecting...\r\n", millis);
-            CDC_Send_DATA (data,strlen(data));
-            cur_i = 0;
-            send_sim_cmd(CMD_AT_CIPSHUT);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CIPMUX);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CGATT);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CSTT);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CIICR);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CIFSR);
-            delay_ms(1500);
-            send_sim_cmd(CMD_AT_CIPSTART);
-            delay_ms(1500);
             sprintf(data, "[%ld] Sending data...\r\n", millis);
             CDC_Send_DATA (data,strlen(data));
-            send_sim_cmd(CMD_AT_CIPSEND);
-            delay_ms(1500);
-            sprintf(data, _post_params_3, id[0], id[1], id[2], id[3]);
-            sprintf(AT_CMD_BUF, _http_post, strlen(data), data);
-            delay_ms(1500);
-            send_sim_cmd(AT_CMD_BUF);
-            put_char(&U2_buf_tx, (uint8_t) 26);
+            cur_i = 0;
+            sprintf(data, "%ld", (GTC_GATE_IDH<<8 | GTC_GATE_IDL));
+            send_sim_data(id, data, RTC_GetCounter());
             sprintf(data, "[%ld] Data sent.\r\n", millis);
             CDC_Send_DATA (data,strlen(data));
             //send_sim_cmd(CMD_AT_CIPCLOSE);
           }
-        }
-
-        if(!isempty(&U2_buf_rx))
-        {
-          d = get_char(&U2_buf_rx);
-          if(d=='\n') {
-            sprintf(data, "\r");
-            CDC_Send_DATA (data,strlen(data));
-          }
-          sprintf(data, "%c", d);
-          CDC_Send_DATA (data,strlen(data));
         }
       }
     } else {
@@ -257,60 +231,6 @@ int main(void)
 
 
   }
-}
-
-static __IO uint32_t TimingDelay;
-void delay_ms(uint32_t nTime){
-  TimingDelay = nTime;
-  while(TimingDelay != 0);
-}
-
-void SysTick_Handler(void){
-  if (TimingDelay != 0x00) --TimingDelay;
-  ++millis;
-}
-
-void Timers_Init(){
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  // enable timer clock
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);
-  // configure NVIC
-  NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  // configure timer
-  TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-  TIM_TimeBaseStructure.TIM_Prescaler
-  = SystemCoreClock / 10000 - 1; //1 ms
-  TIM_TimeBaseStructure.TIM_Period = 10000-1; // every 50ms interrupt
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-  TIM_TimeBaseInit(TIM2 , &TIM_TimeBaseStructure);
-  // Enable Timer
-  TIM_ITConfig(TIM2 , TIM_IT_Update , ENABLE);
-  TIM_Cmd(TIM2 , ENABLE);
-
-  // rtc
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR, ENABLE);
-  PWR_BackupAccessCmd(ENABLE);
-  /* Reset Backup Domain */
-  //BKP_DeInit();
-
-  /* Enable LSE */
-  RCC_LSEConfig(RCC_LSE_ON);
-  /* Wait till LSE is ready */
-  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-  {}
-  RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
-  RCC_RTCCLKCmd(ENABLE);
-  RTC_WaitForSynchro();
-
-  RTC_WaitForLastTask();
-  RTC_SetPrescaler(32767);
-  RTC_WaitForLastTask();
 }
 
 void TIM2_IRQHandler(void)

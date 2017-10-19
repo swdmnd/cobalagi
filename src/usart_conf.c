@@ -1,6 +1,6 @@
 #include "usart_conf.h"
 
-USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
+__IO USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
 
 void USART_Config(){
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
@@ -83,11 +83,12 @@ void USART_Config(){
   init_usart_buffer(&U2_buf_tx, USART3);
 }
 
-uint8_t get_char(USART_BUFFER* u_buf){
+uint8_t get_char(__IO USART_BUFFER* u_buf){
+  while (isempty(u_buf));
   return dequeue(u_buf);
 }
 
-void put_char(USART_BUFFER* u_buf, uint8_t c)
+void put_char(__IO USART_BUFFER* u_buf, uint8_t c)
 {
   enqueue(u_buf , c);
   //if (!TxPrimed) {
@@ -97,14 +98,14 @@ void put_char(USART_BUFFER* u_buf, uint8_t c)
   //}
 }
 
-void init_usart_buffer(USART_BUFFER* u_buf, USART_TypeDef* USART_num){
+void init_usart_buffer(__IO USART_BUFFER* u_buf, USART_TypeDef* USART_num){
   u_buf->tail=0;
   u_buf->head=0;
   u_buf->isoverflow=false;
   u_buf->USART_num=USART_num;
 }
 
-void enqueue(USART_BUFFER* u_buf, uint8_t data)
+void enqueue(__IO USART_BUFFER* u_buf, uint8_t data)
 {
   uint16_t tail = u_buf->tail;
   if(++u_buf->tail >= USART_BUFFER_SIZE)
@@ -123,7 +124,7 @@ void enqueue(USART_BUFFER* u_buf, uint8_t data)
   u_buf->buffer[tail] = data;
 }
 
-uint8_t dequeue(USART_BUFFER* u_buf)
+uint8_t dequeue(__IO USART_BUFFER* u_buf)
 {
   if(u_buf->tail == u_buf->head)
   {
@@ -137,12 +138,12 @@ uint8_t dequeue(USART_BUFFER* u_buf)
   return data;
 }
 
-void clear_queue(USART_BUFFER* u_buf)
+void clear_queue(__IO USART_BUFFER* u_buf)
 {
   u_buf->tail = u_buf->head = u_buf->isoverflow = 0;
 }
 
-bool isempty(USART_BUFFER* u_buf)
+bool isempty(__IO USART_BUFFER* u_buf)
 {
   if(u_buf->tail == u_buf->head)
   {
@@ -187,19 +188,18 @@ void USART3_IRQHandler(void)
     // buffer the data (or toss it if there's no room
     // Flow control will prevent this
     data = USART_ReceiveData(USART3) & 0xff;
-#ifdef _DEBUG_SIM900A_
-//    if(bDeviceState == CONFIGURED){
-//      unsigned char buf[2];
-//      if(data=='\n') {
-//        sprintf(buf, "\r");
-//        CDC_Send_DATA (buf,1);
-//      }
-//      sprintf(buf, "%c", data);
-//      CDC_Send_DATA (buf,strlen(buf));
-//    }
-#else
-    enqueue(&U2_buf_rx, data);
+#if _DEBUG_SIM900A_
+    if(bDeviceState == CONFIGURED){
+      unsigned char buf[2];
+      if(data=='\n') {
+        sprintf(buf, "\r");
+        CDC_Send_DATA (buf,1);
+      }
+      sprintf(buf, "%c", data);
+      CDC_Send_DATA (buf,strlen(buf));
+    }
 #endif
+    enqueue(&U2_buf_rx, data);
   }
   if(USART_GetITStatus(USART3 , USART_IT_TXE) != RESET)
   {
@@ -218,8 +218,29 @@ void USART3_IRQHandler(void)
   }
 }
 
-void print_r(USART_BUFFER* u_tx, uint8_t* p_arr, int length){
+void print_r(__IO USART_BUFFER* u_tx, uint8_t* p_arr, int length){
   for(int i = 0; i < length; ++i){
       put_char(u_tx, *(p_arr++));
   }
+}
+
+bool USART_wait_for(__IO USART_BUFFER* u_buf, uint8_t* str, uint32_t timeout){
+  uint32_t ms = millis;
+  int len = strlen(str);
+  int i = 0;
+  uint8_t ch;
+  while( millis-ms < timeout ){
+    if(!isempty(u_buf)){
+      ch = get_char(u_buf);
+      if(ch == str[i]){
+        if(++i == len) return true;
+      } else {
+        i=0;
+        if(ch == str[i]){
+          ++i;
+        }
+      }
+    }
+  }
+  return false;
 }

@@ -99,6 +99,7 @@
 		<Unit filename="inc\stm32f10x.h" />
 		<Unit filename="inc\stm32f10x_conf.h" />
 		<Unit filename="inc\system_stm32f10x.h" />
+		<Unit filename="inc\timers_conf.h" />
 		<Unit filename="inc\usart_conf.h" />
 		<Unit filename="inc\usb_conf.h" />
 		<Unit filename="inc\usb_core.h" />
@@ -235,6 +236,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\system_stm32f10x.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\timers_conf.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\usart_conf.c">
