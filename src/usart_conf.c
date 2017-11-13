@@ -2,6 +2,9 @@
 
 __IO USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
 
+void enqueue(__IO USART_BUFFER*, uint8_t);
+uint8_t dequeue(__IO USART_BUFFER*);
+
 void USART_Config(){
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
@@ -77,18 +80,31 @@ void USART_Config(){
   USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
   USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
 
-  init_usart_buffer(&U1_buf_rx, USART1);
-  init_usart_buffer(&U2_buf_rx, USART3);
-  init_usart_buffer(&U1_buf_tx, USART1);
-  init_usart_buffer(&U2_buf_tx, USART3);
+  USART_InitBuffer(&U1_buf_rx, USART1);
+  USART_InitBuffer(&U2_buf_rx, USART3);
+  USART_InitBuffer(&U1_buf_tx, USART1);
+  USART_InitBuffer(&U2_buf_tx, USART3);
 }
 
-uint8_t get_char(__IO USART_BUFFER* u_buf){
-  while (isempty(u_buf));
+uint8_t USART_GetChar(__IO USART_BUFFER* u_buf){
+  while (USART_IsEmpty(u_buf));
   return dequeue(u_buf);
 }
 
-void put_char(__IO USART_BUFFER* u_buf, uint8_t c)
+uint8_t USART_Peek(__IO USART_BUFFER* u_buf, uint16_t offset){
+  uint16_t peek_i = offset + u_buf->head;
+  if (peek_i >= USART_BUFFER_SIZE) peek_i %= USART_BUFFER_SIZE;
+  // Kalau di luar range buffer
+  if (u_buf->head < u_buf->tail){
+    if(u_buf->head >= peek_i || peek_i >= u_buf->tail) return 0;
+  }
+  if (u_buf->head > u_buf->tail){
+    if(u_buf->head <= peek_i && peek_i <= u_buf->tail) return 0;
+  }
+  return u_buf->buffer[peek_i];
+}
+
+void USART_PutChar(__IO USART_BUFFER* u_buf, uint8_t c)
 {
   enqueue(u_buf , c);
   //if (!TxPrimed) {
@@ -98,7 +114,7 @@ void put_char(__IO USART_BUFFER* u_buf, uint8_t c)
   //}
 }
 
-void init_usart_buffer(__IO USART_BUFFER* u_buf, USART_TypeDef* USART_num){
+void USART_InitBuffer(__IO USART_BUFFER* u_buf, USART_TypeDef* USART_num){
   u_buf->tail=0;
   u_buf->head=0;
   u_buf->isoverflow=false;
@@ -114,12 +130,9 @@ void enqueue(__IO USART_BUFFER* u_buf, uint8_t data)
   }
   if(u_buf->tail == u_buf->head)
   {
-//    if(++u_buf->head >= USART_BUFFER_SIZE)
-//    {
-//      u_buf->head = 0;
-//    }
     u_buf->tail = tail;
     u_buf->isoverflow=true;
+    return;
   }
   u_buf->buffer[tail] = data;
 }
@@ -138,12 +151,12 @@ uint8_t dequeue(__IO USART_BUFFER* u_buf)
   return data;
 }
 
-void clear_queue(__IO USART_BUFFER* u_buf)
+void USART_ClearBuffer(__IO USART_BUFFER* u_buf)
 {
   u_buf->tail = u_buf->head = u_buf->isoverflow = 0;
 }
 
-bool isempty(__IO USART_BUFFER* u_buf)
+bool USART_IsEmpty(__IO USART_BUFFER* u_buf)
 {
   if(u_buf->tail == u_buf->head)
   {
@@ -162,13 +175,24 @@ void USART1_IRQHandler(void)
     // buffer the data (or toss it if there's no room
     // Flow control will prevent this
     data = USART_ReceiveData(USART1) & 0xff;
+#if _DEBUG_HC11_
+    if(bDeviceState == CONFIGURED){
+      unsigned char buf[2];
+      if(data=='\n') {
+        sprintf(buf, "\r");
+        CDC_Send_DATA (buf,1);
+      }
+      sprintf(buf, "%c", data);
+      CDC_Send_DATA (buf,strlen(buf));
+    }
+#endif
     enqueue(&U1_buf_rx, data);
   }
   if(USART_GetITStatus(USART1 , USART_IT_TXE) != RESET)
   {
     // buffer the data (or toss it if there's no room
     // Flow control will prevent this
-    if (!isempty(&U1_buf_tx)){
+    if (!USART_IsEmpty(&U1_buf_tx)){
       uint8_t data = dequeue(&U1_buf_tx);
       USART_SendData(USART1 , data);
     } else {
@@ -206,7 +230,7 @@ void USART3_IRQHandler(void)
 
     // buffer the data (or toss it if there's no room
     // Flow control will prevent this
-    if (!isempty(&U2_buf_tx)){
+    if (!USART_IsEmpty(&U2_buf_tx)){
       uint8_t data = dequeue(&U2_buf_tx);
       USART_SendData(USART3 , data);
     } else {
@@ -220,23 +244,26 @@ void USART3_IRQHandler(void)
 
 void print_r(__IO USART_BUFFER* u_tx, uint8_t* p_arr, int length){
   for(int i = 0; i < length; ++i){
-      put_char(u_tx, *(p_arr++));
+      USART_PutChar(u_tx, *(p_arr++));
   }
 }
 
-bool USART_wait_for(__IO USART_BUFFER* u_buf, uint8_t* str, uint32_t timeout){
+bool USART_wait_for_str(__IO USART_BUFFER* u_buf, uint8_t* str, uint32_t timeout){
+  USART_wait_for_bytes(u_buf, str, strlen(str), timeout);
+}
+
+bool USART_wait_for_bytes(__IO USART_BUFFER* u_buf, uint8_t* bytes, uint8_t num_bytes, uint32_t timeout){
   uint32_t ms = millis;
-  int len = strlen(str);
   int i = 0;
-  uint8_t ch;
+  uint8_t byte;
   while( millis-ms < timeout ){
-    if(!isempty(u_buf)){
-      ch = get_char(u_buf);
-      if(ch == str[i]){
-        if(++i == len) return true;
+    if(!USART_IsEmpty(u_buf)){
+      byte = USART_GetChar(u_buf);
+      if(byte == bytes[i]){
+        if(++i == num_bytes) return true;
       } else {
         i=0;
-        if(ch == str[i]){
+        if(byte == bytes[i]){
           ++i;
         }
       }

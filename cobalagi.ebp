@@ -86,6 +86,7 @@
 		<Unit filename="cmsis\core_cm3.h" />
 		<Unit filename="cmsis\core_cmFunc.h" />
 		<Unit filename="cmsis\core_cmInstr.h" />
+		<Unit filename="inc\gtclib.h" />
 		<Unit filename="inc\hw_config.h" />
 		<Unit filename="inc\main.h" />
 		<Unit filename="inc\platform_config.h" />
@@ -206,6 +207,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="SPL\src\stm32f10x_wwdg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\gtclib.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\hw_config.c">

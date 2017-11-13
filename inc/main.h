@@ -10,6 +10,7 @@
 #include "timers_conf.h"
 #include "usart_conf.h"
 #include "sim900a.h"
+#include "gtclib.h"
 
 #include <stdio.h>
 #include <string.h>

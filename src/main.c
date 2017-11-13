@@ -38,13 +38,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define GTC_GATE_IDL 0x01
-#define GTC_GATE_IDH 0x00
-#define GTC_CMD_PING 0x01
-#define GTC_CMD_ECHO 0x02
-#define GTC_CMD_ACK 0xFF
 
-#define GTC_BUFFER_SIZE 32
+#define __SET_HC11__ 0
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -58,17 +53,12 @@ uint8_t packet_receive=1;
 uint8_t packet_sent=1;
 
 int led_state=0;
-
-typedef struct{
-  uint8_t buffer[GTC_BUFFER_SIZE];
-  int length;
-} GTC_BUFFER_STRUCT;
-
-GTC_BUFFER_STRUCT GTC_Buffer;
+GTC_ID_STRUCT id;
+int cur_i = 0;
 
 unsigned char welcome_msg[] = "---Debug log start---\r\n";
 /* Private function prototypes -----------------------------------------------*/
-
+void ComPort_PrintTimeStamp();
 
 int main(void)
 {
@@ -78,6 +68,7 @@ int main(void)
   USB_Init();
 
   SysTick_Config(SystemCoreClock / 1000);
+  NVIC_SetPriority(SysTick_IRQn, 1);
   RTC_Software_Init();
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
@@ -88,27 +79,62 @@ int main(void)
   gpio.GPIO_Mode = GPIO_Mode_Out_PP;
   gpio.GPIO_Speed = GPIO_Speed_2MHz;
   GPIO_Init(GPIOC, &gpio);
+  GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
 
   USART_Config();
-  sim900_config_buffer(&U2_buf_tx, &U2_buf_rx);
-  sim900_init();
+
+#if __SET_HC11__
+  /*
+    Set transmitting power of module, x is optional from 1 to 8, respectively representing -30dBm,
+    -20dBm, -15dBm, -10dBm, 0dBm, 5dBm, 7dBm, and 10dBm; and the default is 8 (namely,
+    10dBm).
+    e.g.:
+      Send ÅgAT+P6Åh to module
+      And the module returns ÅgOK-P6Åh
+  */
+  delay_ms(1000);
+  print_r(&U1_buf_tx, "AT\r\n", 4);
+  USART_wait_for_str(&U1_buf_rx, "OK", 10000);
+  print_r(&U1_buf_tx, "AT+P8\r\n", 7);
+
+  while(1);
+#endif
+
+  //delay_ms(5000);
+//  unsigned char data[50];
+//  sprintf(data, "Mengirim: Pengujian pengiriman data.\r\nDiterima: ");
+//  CDC_Send_DATA (data,strlen(data));
+//  sprintf(data, "Pengujian pengiriman data.");
+//  print_r(&U1_buf_tx, data, strlen(data));
+//  while(1){
+//    sprintf(data, "%c", USART_GetChar(&U1_buf_rx));
+//    CDC_Send_DATA (data,strlen(data));
+//  }
+  SIM900A_Init(&U2_buf_tx, &U2_buf_rx);
 
   //sync time
   RTC_WaitForLastTask();
-  RTC_SetCounter(get_server_time());
+  RTC_SetCounter(SIM900A_GetServerTime());
   RTC_WaitForLastTask();
+
+  if(bDeviceState == CONFIGURED){
+    char buf[512];
+    const time_t time = RTC_GetCounter();
+    char* time_str = asctime(localtime(&time));
+    time_str[strlen(time_str)-1] = 0;
+    sprintf(buf, "[%s] Sinkronisasi waktu selesai.\r\n", time_str);
+    CDC_Send_DATA(buf, strlen(buf));
+  }
 
   Timers_Init();
 
-  int first_time = 1;
+  int first_time = 0;
   unsigned char data[50];
   uint8_t d = 0;
-  int cur_i = 0;
-  unsigned char id[5];
-  id[4] = 0;
+  GTC_ID_STRUCT id1;
   while (1)
   {
-    GPIO_WriteBit(GPIOB, GPIO_Pin_12, Bit_RESET);
+    GPIO_WriteBit(GPIOB, GPIO_Pin_12, Bit_SET);
     if (bDeviceState == CONFIGURED)
     {
       CDC_Receive_DATA();
@@ -120,139 +146,104 @@ int main(void)
             first_time=0;
             CDC_Send_DATA (welcome_msg,strlen(welcome_msg));
           } else {
-            //sprintf(data, "%c", Receive_Buffer[0]);
-            //CDC_Send_DATA (data,strlen(data));
             if(Receive_Buffer[0] == '1'){
-              send_sim_cmd(CMD_AT_CIPSHUT);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIPSHUT);
             } else if(Receive_Buffer[0] == '2'){
-              send_sim_cmd(CMD_AT_CIPMUX);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIPMUX);
             } else if(Receive_Buffer[0] == '3'){
-              send_sim_cmd(CMD_AT_CGATT);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CGATT);
             } else if(Receive_Buffer[0] == '4'){
-              send_sim_cmd(CMD_AT_CSTT);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CSTT);
             } else if(Receive_Buffer[0] == '5'){
-              send_sim_cmd(CMD_AT_CIICR);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIICR);
             } else if(Receive_Buffer[0] == '6'){
-              send_sim_cmd(CMD_AT_CIFSR);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIFSR);
             } else if(Receive_Buffer[0] == '7'){
-              send_sim_cmd(CMD_AT_CIPSTART);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIPSTART);
             } else if(Receive_Buffer[0] == '8'){
-              send_sim_cmd(CMD_AT_CIPSEND);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIPSEND);
             } else if(Receive_Buffer[0] == '9'){
               sprintf(AT_CMD_BUF, _http_post, strlen(_post_params_3), _post_params);
-              send_sim_cmd(AT_CMD_BUF);
-              put_char(&U2_buf_tx, (uint8_t) 26);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(AT_CMD_BUF);
+              USART_PutChar(&U2_buf_tx, (uint8_t) 26);
             } else if(Receive_Buffer[0] == '/'){
               sprintf(AT_CMD_BUF, _http_post, strlen(_post_params_2), _post_params_2);
-              send_sim_cmd(AT_CMD_BUF);
-              put_char(&U2_buf_tx, (uint8_t) 26);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(AT_CMD_BUF);
+              USART_PutChar(&U2_buf_tx, (uint8_t) 26);
             } else if(Receive_Buffer[0] == '0'){
-              send_sim_cmd(CMD_AT_CIPCLOSE);
-//              put_char(&U1_buf_tx, (uint8_t) Receive_Buffer[0]);
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
+              SIM900A_Cmd(CMD_AT_CIPCLOSE);
             } else if(Receive_Buffer[0] != 0x0d){
               for(int i = 0; i < Receive_length; ++i){
-                put_char(&U2_buf_tx, (uint8_t) Receive_Buffer[i]);
+                USART_PutChar(&U2_buf_tx, (uint8_t) Receive_Buffer[i]);
               }
-              //sprintf(data, "%c", Receive_Buffer[0]);
-              //CDC_Send_DATA (data,strlen(data));
             } else {
-              put_char(&U2_buf_tx, (uint8_t) '\r');
-              put_char(&U2_buf_tx, (uint8_t) '\n');
-//              put_char(&U1_buf_tx, (uint8_t) '\r');
-//              put_char(&U1_buf_tx, (uint8_t) '\n');
-              //sprintf(data, "\r\n");
-              //CDC_Send_DATA (data,2);
+              USART_PutChar(&U2_buf_tx, (uint8_t) '\r');
+              USART_PutChar(&U2_buf_tx, (uint8_t) '\n');
             }
           }
         }
-//          CDC_Send_DATA ("aaa",3);
         Receive_length = 0;
       }
       if(!first_time){
-        if(!isempty(&U1_buf_rx))
-        {
-          d = get_char(&U1_buf_rx);
-          //sprintf(data, "%02x", d);
-          //CDC_Send_DATA (data,strlen(data));
-          id[cur_i++] = d;
-          if(cur_i>3){
-            sprintf(data, "[%ld] RFID Detected: %02x%02x%02x%02x\r\n", millis, id[0], id[1], id[2], id[3]);
-            CDC_Send_DATA (data,strlen(data));
-            sprintf(data, "[%ld] Sending data...\r\n", millis);
-            CDC_Send_DATA (data,strlen(data));
-            cur_i = 0;
-            sprintf(data, "%ld", (GTC_GATE_IDH<<8 | GTC_GATE_IDL));
-            send_sim_data(id, data, RTC_GetCounter());
-            sprintf(data, "[%ld] Data sent.\r\n", millis);
-            CDC_Send_DATA (data,strlen(data));
-            //send_sim_cmd(CMD_AT_CIPCLOSE);
-          }
-        }
+        //GTC_Send();
       }
     } else {
       first_time=1;
-      GPIO_WriteBit(GPIOC, GPIO_Pin_13, led_state ? Bit_SET : Bit_RESET);
+      //GPIO_WriteBit(GPIOC, GPIO_Pin_13, led_state ? Bit_SET : Bit_RESET);
       led_state = !led_state;
 
       delay_ms(200);
     }
-
-
+    GTC_Send();
   }
 }
 
 void TIM2_IRQHandler(void)
 {
-  TIM_ClearITPendingBit(TIM2 ,TIM_IT_Update);
-  /* do something */
-  GTC_Buffer.buffer[0] = 0x00;
-  GTC_Buffer.buffer[1] = 0xFF;
-  GTC_Buffer.buffer[2] = 3;
-  GTC_Buffer.buffer[3] = GTC_CMD_PING;
-  GTC_Buffer.buffer[4] = GTC_GATE_IDH;
-  GTC_Buffer.buffer[5] = GTC_GATE_IDL;
-  GTC_Buffer.length = 6;
+  GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
+  uint8_t max_retry = 0;
+  while(!USART_IsEmpty(&U1_buf_rx) && max_retry < 4)
+  {
+    ++max_retry;
+    if(USART_wait_for_bytes(&U1_buf_rx, GTC_Header, GTC_HEADn, 1000)){
+      uint8_t msg_length = USART_GetChar(&U1_buf_rx);
+      uint8_t checksum=0;
+      for(int i = 0; i < msg_length; ++i){
+        GTC_Buffer.buffer[i] = USART_GetChar(&U1_buf_rx);
+        checksum += GTC_Buffer.buffer[i];
+      }
+      if((checksum + USART_GetChar(&U1_buf_rx)) & 0xFF != 0x00) continue;
+      if(GTC_Buffer.buffer[0] == 0xA2){
+        id.timestamp = RTC_GetCounter();
 
-  print_r(&U1_buf_tx, GTC_Buffer.buffer, GTC_Buffer.length);
-  if(bDeviceState == CONFIGURED){
-    char buf[512];
-    sprintf(buf, "[%ld] PING sent\r\n", RTC_GetCounter());
-    CDC_Send_DATA(buf, strlen(buf));
+        id.id_length = GTC_Buffer.buffer[1];
+        for(int i = 0; i < id.id_length; ++i){
+          id.id[i] = GTC_Buffer.buffer[i+2];
+        }
+        GTC_Enqueue(&id);
+        GTC_Ack(&id);
+        if(bDeviceState == CONFIGURED){
+          char data[50];
+          sprintf(data, "RFID Detected: %02x%02x%02x%02x\r\n", id.id[0], id.id[1], id.id[2], id.id[3]);
+          CDC_Send_DATA (data,strlen(data));
+        }
+      }
+    }
   }
-}
 
+  /* do something */
+  GTC_Ping();
+//  if(bDeviceState == CONFIGURED){
+//    char buf[512];
+//    const time_t time = RTC_GetCounter();
+//    char* time_str = asctime(localtime(&time));
+//    time_str[strlen(time_str)-1] = 0;
+//    sprintf(buf, "[%s] PING sent\r\n", time_str);
+//    CDC_Send_DATA(buf, strlen(buf));
+//  }
+  TIM_ClearITPendingBit(TIM2 ,TIM_IT_Update);
+  GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);
+}
 #ifdef USE_FULL_ASSERT
 /*******************************************************************************
 * Function Name  : assert_failed

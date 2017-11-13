@@ -608,7 +608,7 @@
 	"platform_config.h"
 	"usb_type.h"
 
-1358792851 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usb_type.h
+1509927932 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usb_type.h
 	"usb_conf.h"
 
 1358792830 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usb_conf.h
@@ -718,20 +718,20 @@
 1358792850 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usb_sil.c
 	"usb_lib.h"
 
-1508378398 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
+1510533691 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
 	"main.h"
 
-1508378316 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\sim900a.c
+1510265777 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\sim900a.c
 	"sim900a.h"
 
-1508377491 d:\my files\aa\teknik elektro\ta\cobalagi\inc\sim900a.h
+1508982965 d:\my files\aa\teknik elektro\ta\cobalagi\inc\sim900a.h
 	"usart_conf.h"
 	"timers_conf.h"
 	<string.h>
 	<stdbool.h>
 	<stdlib.h>
 
-1508377491 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
+1510020440 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
 	"hw_config.h"
 	"usb_lib.h"
 	"usb_desc.h"
@@ -742,10 +742,10 @@
 	"timers_conf.h"
 	<stdbool.h>
 
-1508377491 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usart_conf.c
+1510143608 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usart_conf.c
 	"usart_conf.h"
 
-1508361286 d:\my files\aa\teknik elektro\ta\cobalagi\inc\main.h
+1508669230 d:\my files\aa\teknik elektro\ta\cobalagi\inc\main.h
 	"hw_config.h"
 	"usb_lib.h"
 	"usb_desc.h"
@@ -753,6 +753,7 @@
 	"timers_conf.h"
 	"usart_conf.h"
 	"sim900a.h"
+	"gtclib.h"
 	<stdio.h>
 	<string.h>
 	<stdbool.h>
@@ -761,6 +762,16 @@
 1508369158 d:\my files\aa\teknik elektro\ta\cobalagi\inc\timers_conf.h
 	"platform_config.h"
 
-1508369183 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\timers_conf.c
+1510324776 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\timers_conf.c
 	"timers_conf.h"
+
+1510196158 d:\my files\aa\teknik elektro\ta\cobalagi\inc\gtclib.h
+	"timers_conf.h"
+	"usart_conf.h"
+	"sim900a.h"
+	<stdint.h>
+	<stdbool.h>
+
+1510482608 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\gtclib.c
+	"gtclib.h"
 

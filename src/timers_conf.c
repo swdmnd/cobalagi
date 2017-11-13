@@ -23,15 +23,13 @@ void RTC_Software_Init(){
   /* Enable LSE */
   RCC_LSEConfig(RCC_LSE_ON);
   /* Wait till LSE is ready */
-  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET)
-  {}
+  while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET);
   RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
   RCC_RTCCLKCmd(ENABLE);
   RTC_WaitForSynchro();
 
   RTC_WaitForLastTask();
   RTC_SetPrescaler(32767);
-  RTC_WaitForLastTask();
 }
 
 void Timers_Init(){
@@ -48,8 +46,8 @@ void Timers_Init(){
   // configure timer
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
   TIM_TimeBaseStructure.TIM_Prescaler
-  = SystemCoreClock / 10000 - 1; //1 ms
-  TIM_TimeBaseStructure.TIM_Period = 10000-1; // every 50ms interrupt
+  = 1124; //1 ms
+  TIM_TimeBaseStructure.TIM_Period = 31999; // every 50ms interrupt
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseInit(TIM2 , &TIM_TimeBaseStructure);

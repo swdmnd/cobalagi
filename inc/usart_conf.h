@@ -4,6 +4,7 @@
 #define USART_BUFFER_SIZE 320
 
 #define _DEBUG_SIM900A_ 1
+#define _DEBUG_HC11_ 0
 
 #ifdef _DEBUG_SIM900A_
   #include "hw_config.h"
@@ -29,14 +30,14 @@ typedef struct{
 extern __IO USART_BUFFER U1_buf_rx, U2_buf_rx, U1_buf_tx, U2_buf_tx;
 
 void USART_Config();
-uint8_t get_char(__IO USART_BUFFER*);
-void put_char(__IO USART_BUFFER*, uint8_t);
-void init_usart_buffer(__IO USART_BUFFER*, USART_TypeDef*);
-void enqueue(__IO USART_BUFFER*, uint8_t);
-uint8_t dequeue(__IO USART_BUFFER*);
-void clear_queue(__IO USART_BUFFER*);
-bool isempty(__IO USART_BUFFER*);
+uint8_t USART_GetChar(__IO USART_BUFFER*);
+uint8_t USART_Peek(__IO USART_BUFFER*, uint16_t);
+void USART_PutChar(__IO USART_BUFFER*, uint8_t);
+void USART_InitBuffer(__IO USART_BUFFER*, USART_TypeDef*);
+void USART_ClearBuffer(__IO USART_BUFFER*);
+bool USART_IsEmpty(__IO USART_BUFFER*);
 void print_r(__IO USART_BUFFER*, uint8_t*, int);
-bool USART_wait_for(__IO USART_BUFFER*, uint8_t*, uint32_t);
+bool USART_wait_for_str(__IO USART_BUFFER*, uint8_t*, uint32_t);
+bool USART_wait_for_bytes(__IO USART_BUFFER*, uint8_t*, uint8_t, uint32_t);
 
 #endif /* USART_CONF_H_INCLUDED */

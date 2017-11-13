@@ -23,14 +23,17 @@ extern char _post_params[];
 extern char _post_params_2[];
 extern char _post_params_3[];
 extern char _params[50];
-extern char AT_CMD_BUF[255];
+extern char AT_CMD_BUF[1024];
 
 __IO USART_BUFFER *SIM_USART_TX, *SIM_USART_RX;
 
-void sim900_init();
-void sim900_config_buffer(__IO USART_BUFFER*, __IO USART_BUFFER*);
-void send_sim_cmd(char*);
-void send_sim_data(char*, char*, uint32_t);
-uint32_t get_server_time();
+void SIM900A_StartMobileData();
+void SIM900A_StopMobileData();
+void SIM900A_OpenConnection();
+void SIM900A_Init(__IO USART_BUFFER*, __IO USART_BUFFER*);
+void SIM900A_Cmd(char*);
+void SIM900A_GTCSend(char*, char*, uint32_t);
+void SIM900A_GTCSendText(char*);
+uint32_t SIM900A_GetServerTime();
 
 #endif /* SIM900A_H_INCLUDED */

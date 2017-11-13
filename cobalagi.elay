@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBitz_layout_file>
 	<ActiveTarget name="Release" />
+	<File name="inc\gtclib.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="290" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="inc\hw_config.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2028" topLine="19" />
+		</Cursor>
+	</File>
+	<File name="inc\main.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="248" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="inc\sim900a.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="652" topLine="4" />
 		</Cursor>
 	</File>
 	<File name="inc\stm32_it.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -11,49 +26,59 @@
 			<Cursor1 position="1984" topLine="14" />
 		</Cursor>
 	</File>
-	<File name="inc\stm32f10x.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="inc\stm32f10x.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="56152" topLine="1320" />
+			<Cursor1 position="109804" topLine="2095" />
+		</Cursor>
+	</File>
+	<File name="inc\timers_conf.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="180" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="inc\usart_conf.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1112" topLine="15" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_conf.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="4" />
+			<Cursor1 position="0" topLine="76" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_core.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="213" />
+			<Cursor1 position="0" topLine="228" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_def.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="35" />
+			<Cursor1 position="0" topLine="65" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_desc.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="24" />
+			<Cursor1 position="0" topLine="39" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_init.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="35" />
+			<Cursor1 position="0" topLine="20" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_int.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="3" />
+			<Cursor1 position="0" topLine="18" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_istr.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="28" />
+			<Cursor1 position="0" topLine="67" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_lib.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="22" />
+			<Cursor1 position="0" topLine="25" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_mem.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -73,7 +98,7 @@
 	</File>
 	<File name="inc\usb_regs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="638" />
+			<Cursor1 position="0" topLine="644" />
 		</Cursor>
 	</File>
 	<File name="inc\usb_sil.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -86,24 +111,74 @@
 			<Cursor1 position="0" topLine="27" />
 		</Cursor>
 	</File>
-	<File name="src\hw_config.c" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="SPL\inc\misc.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3763" topLine="195" />
+			<Cursor1 position="2475" topLine="53" />
 		</Cursor>
 	</File>
-	<File name="src\main.c" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="SPL\inc\stm32f10x_rcc.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="7825" topLine="212" />
+			<Cursor1 position="19276" topLine="448" />
+		</Cursor>
+	</File>
+	<File name="SPL\inc\stm32f10x_tim.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2164" topLine="51" />
+		</Cursor>
+	</File>
+	<File name="SPL\inc\stm32f10x_usart.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7017" topLine="161" />
+		</Cursor>
+	</File>
+	<File name="SPL\src\stm32f10x_rcc.c" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29828" topLine="865" />
+		</Cursor>
+	</File>
+	<File name="src\gtclib.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="217" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\hw_config.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3763" topLine="339" />
+		</Cursor>
+	</File>
+	<File name="src\main.c" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2507" topLine="52" />
+		</Cursor>
+	</File>
+	<File name="src\sim900a.c" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4110" topLine="88" />
+		</Cursor>
+	</File>
+	<File name="src\stm3210b_eval.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="599" />
 		</Cursor>
 	</File>
 	<File name="src\stm32_it.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5872" topLine="121" />
+			<Cursor1 position="5872" topLine="172" />
+		</Cursor>
+	</File>
+	<File name="src\timers_conf.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="447" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="src\usart_conf.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7672" topLine="207" />
 		</Cursor>
 	</File>
 	<File name="src\usb_core.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="11678" topLine="336" />
+			<Cursor1 position="11678" topLine="1006" />
 		</Cursor>
 	</File>
 	<File name="src\usb_desc.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -116,34 +191,39 @@
 			<Cursor1 position="1322" topLine="21" />
 		</Cursor>
 	</File>
-	<File name="src\usb_init.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\usb_init.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="25" />
+			<Cursor1 position="0" topLine="49" />
 		</Cursor>
 	</File>
-	<File name="src\usb_int.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\usb_int.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="0" />
+			<Cursor1 position="0" topLine="15" />
 		</Cursor>
 	</File>
 	<File name="src\usb_istr.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1274" topLine="18" />
+			<Cursor1 position="1274" topLine="21" />
+		</Cursor>
+	</File>
+	<File name="src\usb_mem.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="60" />
 		</Cursor>
 	</File>
 	<File name="src\usb_prop.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1329" topLine="20" />
+			<Cursor1 position="1329" topLine="299" />
 		</Cursor>
 	</File>
-	<File name="src\usb_pwr.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src\usb_pwr.c" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4802" topLine="129" />
+			<Cursor1 position="4802" topLine="288" />
 		</Cursor>
 	</File>
 	<File name="src\usb_regs.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="54" />
+			<Cursor1 position="0" topLine="51" />
 		</Cursor>
 	</File>
 	<File name="src\usb_sil.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
