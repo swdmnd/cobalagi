@@ -82,6 +82,8 @@ int main(void)
   GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
 
   USART_Config();
+//  NVIC_SetPriority(USART1_IRQn, 1);
+//  NVIC_SetPriority(USART3_IRQn, 2);
 
 #if __SET_HC11__
   /*
@@ -101,9 +103,10 @@ int main(void)
 #endif
 
   //delay_ms(5000);
-//  unsigned char data[50];
-//  sprintf(data, "Mengirim: Pengujian pengiriman data.\r\nDiterima: ");
+  unsigned char data[50];
+//  sprintf(data, "Selamat datang di sistem Gerbang Tol Cerdas.");
 //  CDC_Send_DATA (data,strlen(data));
+//  while(1);
 //  sprintf(data, "Pengujian pengiriman data.");
 //  print_r(&U1_buf_tx, data, strlen(data));
 //  while(1){
@@ -112,13 +115,21 @@ int main(void)
 //  }
   SIM900A_Init(&U2_buf_tx, &U2_buf_rx);
 
+  char buf[512];
+  if(bDeviceState == CONFIGURED){
+    const time_t time = RTC_GetCounter();
+    char* time_str = asctime(localtime(&time));
+    time_str[strlen(time_str)-1] = 0;
+    sprintf(buf, "[%s] Memulai sinkronisasi waktu...\r\n", time_str);
+    CDC_Send_DATA(buf, strlen(buf));
+  }
+
   //sync time
   RTC_WaitForLastTask();
   RTC_SetCounter(SIM900A_GetServerTime());
   RTC_WaitForLastTask();
 
   if(bDeviceState == CONFIGURED){
-    char buf[512];
     const time_t time = RTC_GetCounter();
     char* time_str = asctime(localtime(&time));
     time_str[strlen(time_str)-1] = 0;
@@ -129,7 +140,7 @@ int main(void)
   Timers_Init();
 
   int first_time = 0;
-  unsigned char data[50];
+  //unsigned char data[50];
   uint8_t d = 0;
   GTC_ID_STRUCT id1;
   while (1)
@@ -223,8 +234,11 @@ void TIM2_IRQHandler(void)
         GTC_Enqueue(&id);
         GTC_Ack(&id);
         if(bDeviceState == CONFIGURED){
-          char data[50];
-          sprintf(data, "RFID Detected: %02x%02x%02x%02x\r\n", id.id[0], id.id[1], id.id[2], id.id[3]);
+          char data[512];
+          const time_t time = RTC_GetCounter();
+          char* time_str = asctime(localtime(&time));
+          time_str[strlen(time_str)-1] = 0;
+          sprintf(data, "[%s] RFID Detected: %02x%02x%02x%02x\r\n", time_str, id.id[0], id.id[1], id.id[2], id.id[3]);
           CDC_Send_DATA (data,strlen(data));
         }
       }

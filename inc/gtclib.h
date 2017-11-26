@@ -5,6 +5,14 @@
 #include "usart_conf.h"
 #include "sim900a.h"
 
+#include "hw_config.h"
+#include "usb_lib.h"
+#include "usb_desc.h"
+#include "usb_pwr.h"
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 

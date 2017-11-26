@@ -3,7 +3,7 @@
 
 #define USART_BUFFER_SIZE 320
 
-#define _DEBUG_SIM900A_ 1
+#define _DEBUG_SIM900A_ 0
 #define _DEBUG_HC11_ 0
 
 #ifdef _DEBUG_SIM900A_

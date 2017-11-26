@@ -718,7 +718,7 @@
 1358792850 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\usb_sil.c
 	"usb_lib.h"
 
-1510533691 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
+1511047515 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\main.c
 	"main.h"
 
 1510265777 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\sim900a.c
@@ -731,7 +731,7 @@
 	<stdbool.h>
 	<stdlib.h>
 
-1510020440 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
+1511047648 d:\my files\aa\teknik elektro\ta\cobalagi\inc\usart_conf.h
 	"hw_config.h"
 	"usb_lib.h"
 	"usb_desc.h"
@@ -762,16 +762,23 @@
 1508369158 d:\my files\aa\teknik elektro\ta\cobalagi\inc\timers_conf.h
 	"platform_config.h"
 
-1510324776 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\timers_conf.c
+1510641541 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\timers_conf.c
 	"timers_conf.h"
 
-1510196158 d:\my files\aa\teknik elektro\ta\cobalagi\inc\gtclib.h
+1511047673 d:\my files\aa\teknik elektro\ta\cobalagi\inc\gtclib.h
 	"timers_conf.h"
 	"usart_conf.h"
 	"sim900a.h"
+	"hw_config.h"
+	"usb_lib.h"
+	"usb_desc.h"
+	"usb_pwr.h"
+	<stdio.h>
+	<string.h>
+	<time.h>
 	<stdint.h>
 	<stdbool.h>
 
-1510482608 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\gtclib.c
+1511047603 source:d:\my files\aa\teknik elektro\ta\cobalagi\src\gtclib.c
 	"gtclib.h"
 

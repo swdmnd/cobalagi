@@ -78,6 +78,15 @@ uint8_t GTC_GetNumel(){
 void GTC_Send(){
   if((millis != 0 && millis%GTC_SEND_TIMEOUT==0) || GTC_GetNumel() >= GTC_SEND_NUMEL_LIMIT){
     if(!GTC_IsQueueEmpty()){
+      char buf[512];
+      if(bDeviceState == CONFIGURED){
+        const time_t time = RTC_GetCounter();
+        char* time_str = asctime(localtime(&time));
+        time_str[strlen(time_str)-1] = 0;
+        sprintf(buf, "[%s] Mengirim data...\r\n", time_str);
+        CDC_Send_DATA(buf, strlen(buf));
+      }
+
       GTC_ID_STRUCT id_temp;
       unsigned char text[512];
       unsigned char temp_text[64];
@@ -92,6 +101,14 @@ void GTC_Send(){
       strcat(text,"]}");
       SIM900A_GTCSendText(text);
       GTC_FinalizeDequeue();
+
+      if(bDeviceState == CONFIGURED){
+        const time_t time = RTC_GetCounter();
+        char* time_str = asctime(localtime(&time));
+        time_str[strlen(time_str)-1] = 0;
+        sprintf(buf, "[%s] Selesai mengirim data.\r\n", time_str);
+        CDC_Send_DATA(buf, strlen(buf));
+      }
     }
   }
 }
